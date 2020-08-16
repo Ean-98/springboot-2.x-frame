@@ -35,7 +35,7 @@ public class UserController {
     @ApiOperation("获取用户数组")
     @GetMapping("getList")
     public Result getList(){
-        return ResultUtil.success(userService.list());
+        return ResultUtil.success("hello world");
     }
 
     /**

@@ -1,7 +1,7 @@
 #日志配置
 logging:
   file:
-    name: logger/websys.log
+    name: logger/logs.log
   level:
     root: error
     cn.hlsd.websys: info
@@ -17,3 +17,13 @@ mybatis:
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
+
+#jwt
+jwt:
+  header: Authorization
+  # 令牌前缀
+  token-start-with: Bearer
+  # 使用Base64对该令牌进行编码
+  base64-secret: 44af5348f21c5ea9d9f80ccc5bddfbf3beebc794b9a4a6258573a841170475a03a03bbd44851882faa0eb2a929ecb0c2e1df12498dafb2764aac83d9d3f5d82d
+  # 令牌过期时间 此处单位/毫秒
+  token-validity-in-seconds: 14400000
