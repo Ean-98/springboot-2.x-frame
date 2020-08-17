@@ -3,13 +3,16 @@ package cn.hlsd.websys.config.security;
 import cn.hlsd.websys.util.JwtTokenUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -20,18 +23,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtTokenUtils jwtTokenUtils;
+    /**
+     * 获取访问url所需要的角色信息
+     */
+    private final UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
+    /**
+     * 认证权限处理 - 将上面所获得角色权限与当前登录用户的角色做对比，如果包含其中一个角色即可正常访问
+     */
+    private final UrlAccessDecisionManager urlAccessDecisionManager;
+    /**
+     * 自定义访问无权限接口时403响应内容
+     */
+    private final UrlAccessDeniedHandler urlAccessDeniedHandler;
 
-    public WebSecurityConfig(JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtTokenUtils jwtTokenUtils) {
+    public WebSecurityConfig(JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtTokenUtils jwtTokenUtils, UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource, UrlAccessDecisionManager urlAccessDecisionManager, UrlAccessDeniedHandler urlAccessDeniedHandler) {
 
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtTokenUtils = jwtTokenUtils;
-
+        this.urlFilterInvocationSecurityMetadataSource = urlFilterInvocationSecurityMetadataSource;
+        this.urlAccessDecisionManager = urlAccessDecisionManager;
+        this.urlAccessDeniedHandler = urlAccessDeniedHandler;
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-
         httpSecurity
                 // 禁用 CSRF
                 .csrf().disable()
@@ -83,7 +99,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //允许匿名及登录用户访问
                 .antMatchers("/api/auth/**", "/error/**").permitAll()
                 // 所有请求都需要认证
-                .anyRequest().authenticated();
+                .anyRequest().authenticated().withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+            @Override
+            public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+                o.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource);
+                o.setAccessDecisionManager(urlAccessDecisionManager);
+                return o;
+            }
+        });
+        ;
+
+        // 登录过后访问无权限的接口时自定义403响应内容
+        httpSecurity.exceptionHandling().accessDeniedHandler(urlAccessDeniedHandler);
+
 
         // 禁用缓存
         httpSecurity.headers().cacheControl();

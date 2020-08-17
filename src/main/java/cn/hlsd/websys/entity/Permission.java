@@ -30,5 +30,9 @@ public class Permission implements Serializable {
 
     private String permissionTitle;
 
+    private String url;
+
+    private String pid;
+
 
 }
