@@ -1,19 +1,25 @@
 package cn.hlsd.websys.config.security;
 
+import cn.hlsd.websys.entity.Permission;
+import cn.hlsd.websys.service.IPermissionService;
 import cn.hlsd.websys.util.JwtTokenUtils;
+import cn.hlsd.websys.util.SpringContextUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +29,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtTokenUtils jwtTokenUtils;
+    public static List<Permission> ANNO_URL_LIST = new ArrayList();
+
+    /*获取匿名可访问数组*/
+    public static List<Permission> getANNO_URL_LIST() {
+        if (ANNO_URL_LIST.size() <= 0) {
+            IPermissionService iPermissionService = (IPermissionService) SpringContextUtil.getBean(IPermissionService.class);
+            ANNO_URL_LIST = iPermissionService.list(new QueryWrapper<Permission>().eq("pid", -1));
+        }
+        return ANNO_URL_LIST;
+    }
+
+    /*更新匿名可访问数组*/
+    public static void flushANNO_URL_LIST() {
+        IPermissionService iPermissionService = (IPermissionService) SpringContextUtil.getBean(IPermissionService.class);
+        ANNO_URL_LIST = iPermissionService.list(new QueryWrapper<Permission>().eq("pid", -1));
+    }
+
     /**
      * 获取访问url所需要的角色信息
      */
@@ -51,53 +74,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
                 // 禁用 CSRF
                 .csrf().disable()
-
                 // 授权异常
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
-
                 // 防止iframe 造成跨域
                 .and()
                 .headers()
                 .frameOptions()
                 .disable()
-
                 // 不创建会话
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
                 .and()
                 .authorizeRequests()
-
-                // 放行静态资源
-                .antMatchers(
-                        HttpMethod.GET,
-                        "/*.html",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/webSocket/**"
-                ).permitAll()
-
-                // 放行swagger
-                .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/*/api-docs").permitAll()
-
-                // 放行文件访问
-                .antMatchers("/file/**").permitAll()
-
-                // 放行druid
-                .antMatchers("/druid/**").permitAll()
-
-                // 放行OPTIONS请求
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                //允许匿名及登录用户访问
-                .antMatchers("/api/auth/**", "/error/**").permitAll()
                 // 所有请求都需要认证
                 .anyRequest().authenticated().withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
             @Override
@@ -111,14 +102,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 登录过后访问无权限的接口时自定义403响应内容
         httpSecurity.exceptionHandling().accessDeniedHandler(urlAccessDeniedHandler);
-
-
+        ;
+        // 登录过后访问无权限的接口时自定义403响应内容
+        httpSecurity.exceptionHandling().accessDeniedHandler(urlAccessDeniedHandler);
         // 禁用缓存
         httpSecurity.headers().cacheControl();
-
         // 添加JWT filter
-        httpSecurity
-                .apply(new TokenConfigurer(jwtTokenUtils));
+        httpSecurity.apply(new TokenConfigurer(jwtTokenUtils));
 
     }
 
@@ -127,7 +117,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         private final JwtTokenUtils jwtTokenUtils;
 
         public TokenConfigurer(JwtTokenUtils jwtTokenUtils) {
-
             this.jwtTokenUtils = jwtTokenUtils;
         }
 

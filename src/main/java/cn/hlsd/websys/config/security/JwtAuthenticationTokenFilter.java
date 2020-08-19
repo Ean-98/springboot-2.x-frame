@@ -36,6 +36,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             token = bearerToken.substring(jwtSecurityProperties.getTokenStartWith().length());
         }
 
+        /*访问接口的时候，判断token是否有效并从token里边提取用户信息跟角色记录到此次请求中*/
         if (StringUtils.hasText(token) && jwtTokenUtils.validateToken(token)) {
             Authentication authentication = jwtTokenUtils.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);

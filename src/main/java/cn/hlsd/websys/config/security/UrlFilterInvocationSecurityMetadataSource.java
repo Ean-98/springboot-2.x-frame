@@ -39,11 +39,10 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         // 获取当前请求url
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
-        // TODO 忽略url请放在此处进行过滤放行
-        if ("/login".equals(requestUrl) || requestUrl.contains("logout")) {
+        /*放行匿名URL*/
+        if (incloudUrl(requestUrl)) {
             return null;
         }
-
         // 数据库中所有url
         Permission permission = iPermissionService.getOne(new QueryWrapper<Permission>().eq("url", requestUrl));
         if (null != permission) {
@@ -59,23 +58,47 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
             // 保存该url对应角色权限信息
             return SecurityConfig.createList(roles.toArray(new String[roles.size()]));
         }
-        /*for (Permission permission : permissionList) {
-            // 获取该url所对应的权限
-            List<Permission> permissionList = permissionMapper.selectList(null);
-            if (requestUrl.equals(permission.getUrl())) {
-                List<RoleMenu> permissions = rolePermissionMapper.selectList(new EntityWrapper<RoleMenu>().eq("permission_id", permission.getId()));
-                List<String> roles = new LinkedList<>();
-                if (!CollectionUtils.isEmpty(permissions)) {
-                    Integer roleId = permissions.get(0).getRoleId();
-                    Role role = roleMapper.selectById(roleId);
-                    roles.add(role.getCode());
-                }
-                // 保存该url对应角色权限信息
-                return SecurityConfig.createList(roles.toArray(new String[roles.size()]));
-            }
-        }*/
+
         // 如果数据中没有找到相应url资源则为非法访问，要求用户登录再进行操作
         return SecurityConfig.createList(Constants.ROLE_LOGIN);
+    }
+
+    private boolean incloudUrl(String requestUrl) {
+        for (Permission permission : WebSecurityConfig.ANNO_URL_LIST) {
+            if (boolPaten(requestUrl, permission.getUrl()'
+
+        ')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean boolPaten(String url, String patten) {
+        int index = 0;
+        char[] arr = patten.toCharArray();//url
+        for (int i = 0; i < patten.length(); i++) {
+            if (arr[i] == '*') {
+                if (url.charAt(index) == '/') {
+                    index += 1;
+                    continue;
+                }
+                while (index < url.length() && url.charAt(index) != '/') {
+                    index += 1;
+                }
+            } else {
+                if (arr[i] == url.charAt(index)) {
+                    index += 1;
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+        }
+        if (url.length() - 1 > index) {
+            return false;
+        }
+        return true;
     }
 
     @Override

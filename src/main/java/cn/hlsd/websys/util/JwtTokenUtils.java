@@ -40,11 +40,8 @@ public class JwtTokenUtils implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-
+    /*登陆的时候调用这个函数生成token，并记录用户信息以及角色*/
     public String createToken(Map<String, Object> claims) {
-//        HashMap authMap=new HashMap();
-//        authMap.put("admin");
-//        authMap.put("user");
         return Jwts.builder()
                 .claim(AUTHORITIES_KEY, claims)
                 .claim("ROLE", "admin,user")
@@ -72,7 +69,7 @@ public class JwtTokenUtils implements InitializingBean {
                 .setSigningKey(key)
                 .parseClaimsJws(token)
                 .getBody();
-        log.info("ROLE->"+claims.get("ROLE"));
+        log.info("ROLE->" + claims.get("ROLE"));
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
@@ -87,6 +84,7 @@ public class JwtTokenUtils implements InitializingBean {
 
     public boolean validateToken(String authToken) {
         try {
+            /*校验token格式是否正确*/
             Jwts.parser().setSigningKey(key).parseClaimsJws(authToken);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
