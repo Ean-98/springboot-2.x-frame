@@ -20,6 +20,15 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author Ean
+ * @version 0.1.0
+ * @Description: 这个类也比较重要。重写的是security的接口权限判断方法。
+ * getAttributes函数会去数据库查询某个url所需要的权限
+ * @return
+ * @date 2020/8/27 18:07
+ * @since 0.1.0
+ */
 @Component
 public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
@@ -56,12 +65,17 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
                     roles.add(role.getRoleTitle());
                 }
             }
+            if (roles.size() == 0) {
+                roles.add(Constants.ROLE_LOGIN);
+            }
             // 保存该url对应角色权限信息
             return SecurityConfig.createList(roles.toArray(new String[roles.size()]));
         }
 
         // 如果数据中没有找到相应url资源则为非法访问，要求用户登录再进行操作
-        return SecurityConfig.createList(Constants.ROLE_LOGIN);
+//        return SecurityConfig.createList(Constants.ROLE_LOGIN);
+        String [] roleArr={"user"};
+        return SecurityConfig.createList(roleArr);
     }
 
     private boolean incloudUrl(String requestUrl) {

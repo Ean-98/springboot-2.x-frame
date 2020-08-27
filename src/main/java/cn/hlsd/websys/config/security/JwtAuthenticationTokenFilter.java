@@ -15,6 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @Description: 重点过滤器，该过滤器拦截请求，并校验token。通过则提取角色信息交给security处理
+ * @param null 1
+ * @version 0.1.0
+ * @return
+ * @author Ean
+ * @date 2020/8/27 18:05
+ * @since 0.1.0
+ */
 @Component
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {

@@ -12,6 +12,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
+/**
+ * @Description: 该类的作用是判断用户是否有权限访问当前的url
+ * @version 0.1.0
+ * @return
+ * @author Ean
+ * @date 2020/8/27 18:06
+ * @since 0.1.0
+ */
 @Component
 public class UrlAccessDecisionManager implements AccessDecisionManager {
 

@@ -5,7 +5,6 @@ import cn.hlsd.websys.service.IPermissionService;
 import cn.hlsd.websys.util.JwtTokenUtils;
 import cn.hlsd.websys.util.SpringContextUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
