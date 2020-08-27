@@ -11,7 +11,7 @@
  Target Server Version : 50730
  File Encoding         : 65001
 
- Date: 17/08/2020 16:35:11
+ Date: 27/08/2020 17:51:52
 */
 
 SET NAMES utf8mb4;
@@ -27,7 +27,22 @@ CREATE TABLE `_permission`  (
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `pid` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`permission_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Records of _permission
+-- ----------------------------
+INSERT INTO `_permission` VALUES (1, '获取用户数组', '/user/getList', -1);
+INSERT INTO `_permission` VALUES (2, '匿名可访问url', '/swagger-ui.html', -1);
+INSERT INTO `_permission` VALUES (3, '匿名可访问url', '/swagger-resources/*', -1);
+INSERT INTO `_permission` VALUES (4, '匿名可访问url', '/webjars/*', -1);
+INSERT INTO `_permission` VALUES (5, '匿名可访问url', '/*/api-docs', -1);
+INSERT INTO `_permission` VALUES (6, '匿名可访问url', '/static/**', -1);
+INSERT INTO `_permission` VALUES (7, '匿名可访问url', '/api/auth/**', -1);
+INSERT INTO `_permission` VALUES (8, '匿名可访问url', '/error/**', -1);
+INSERT INTO `_permission` VALUES (9, '匿名可访问url', '/webSocket/**', -1);
+INSERT INTO `_permission` VALUES (10, '匿名可访问url', '/favicon.ico', -1);
+INSERT INTO `_permission` VALUES (11, '匿名可访问url', '/auth/**', -1);
 
 -- ----------------------------
 -- Table structure for _role
@@ -40,6 +55,13 @@ CREATE TABLE `_role`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
 
 -- ----------------------------
+-- Records of _role
+-- ----------------------------
+INSERT INTO `_role` VALUES (1, 'admin');
+INSERT INTO `_role` VALUES (2, 'root');
+INSERT INTO `_role` VALUES (3, 'user');
+
+-- ----------------------------
 -- Table structure for _role_permission
 -- ----------------------------
 DROP TABLE IF EXISTS `_role_permission`;
@@ -48,7 +70,13 @@ CREATE TABLE `_role_permission`  (
   `role_id` int(11) NULL DEFAULT NULL,
   `permission_id` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`role_permission_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Records of _role_permission
+-- ----------------------------
+INSERT INTO `_role_permission` VALUES (1, 1, 1);
+INSERT INTO `_role_permission` VALUES (2, 2, 1);
 
 -- ----------------------------
 -- Table structure for _user
@@ -74,7 +102,7 @@ CREATE TABLE `_user`  (
   `user_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT ' 二维码',
   `user_order_confirm_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT ' 用户下单默认的信息，直接保存json格式在数据库就好，前端自己读取或者修改',
   PRIMARY KEY (`user_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 512 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for _user_role
@@ -89,6 +117,6 @@ CREATE TABLE `_user_role`  (
   `role_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `status` int(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`user_role_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
 
 SET FOREIGN_KEY_CHECKS = 1;

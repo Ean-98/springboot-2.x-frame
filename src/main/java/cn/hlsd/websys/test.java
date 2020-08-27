@@ -1,6 +1,7 @@
 package cn.hlsd.websys;
 
 import com.sun.xml.internal.fastinfoset.util.CharArray;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * @author Ean
@@ -13,9 +14,10 @@ public class test {
 
     public static void main(String[] args) {
         boolean flag=true;
-        String u1 = "/usexc/loginddd/d";
-        String patten = "/*/login*";
-        flag=boolPaten(u1,patten);
+        String u1 = "/user/getList";
+        String patten = "/user/getList";
+        AntPathMatcher antPathMatcher=new AntPathMatcher();
+        flag=antPathMatcher.match(patten,u1);
         System.out.println(flag);
     }
 

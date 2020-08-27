@@ -14,6 +14,7 @@ import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -64,38 +65,15 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
     }
 
     private boolean incloudUrl(String requestUrl) {
-        for (Permission permission : WebSecurityConfig.ANNO_URL_LIST) {
-            if (boolPaten(requestUrl,permission.getUrl())) {
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+        boolean flag;
+        for (Permission permission : WebSecurityConfig.getANNO_URL_LIST()) {
+            flag = antPathMatcher.match(permission.getUrl(), requestUrl);
+            if (flag) {
                 return true;
             }
         }
         return false;
-    }
-    private static boolean boolPaten(String url, String patten) {
-        int index = 0;
-        char[] arr = patten.toCharArray();//url
-        for (int i = 0; i < patten.length(); i++) {
-            if (arr[i] == '*') {
-                if (url.charAt(index)=='/'){
-                    index+=1;
-                    continue;
-                }
-                while (index<url.length()&&url.charAt(index)!='/'){
-                    index+=1;
-                }
-            } else {
-                if (arr[i] == url.charAt(index)) {
-                    index += 1;
-                    continue;
-                } else {
-                    return false;
-                }
-            }
-        }
-        if (url.length()-1>index){
-            return false;
-        }
-        return true;
     }
 
     @Override
